@@ -110,7 +110,7 @@
       // 
       pageSizeCombo.DropDownStyle = ComboBoxStyle.DropDownList;
       pageSizeCombo.FormattingEnabled = true;
-      pageSizeCombo.Items.AddRange(new object[] { "A0", "A3", "A4", "A5", "Auto", "B5", "Legal", "Letter" });
+      pageSizeCombo.Items.AddRange(new object[] { "A0", "A1", "A2", "A3", "A4", "A5", "A6", "B5", "Legal", "Letter", "Auto" });
       pageSizeCombo.Location = new Point(317, 345);
       pageSizeCombo.Name = "pageSizeCombo";
       pageSizeCombo.Size = new Size(121, 23);
@@ -196,7 +196,6 @@
       numericMargin.Name = "numericMargin";
       numericMargin.Size = new Size(120, 23);
       numericMargin.TabIndex = 16;
-      numericMargin.Value = new decimal(new int[] { 36, 0, 0, 0 });
       // 
       // label4
       // 

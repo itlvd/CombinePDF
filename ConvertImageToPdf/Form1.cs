@@ -15,6 +15,7 @@ namespace ConvertImageToPdf
     {
       InitializeComponent();
       SetupEventHandlers();
+      pageSizeCombo.SelectedIndex = 0;
     }
 
     private void SetupEventHandlers()
@@ -177,10 +178,16 @@ namespace ConvertImageToPdf
       {
         case "A0":
           return PageSize.A0;
+        case "A1":
+          return PageSize.A1;
+        case "A2":
+          return PageSize.A2;
         case "A3":
           return PageSize.A3;
         case "A5":
           return PageSize.A5;
+        case "A6":
+          return PageSize.A6;
         case "Letter":
           return PageSize.LETTER;
         case "Legal":
