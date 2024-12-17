@@ -160,6 +160,8 @@ namespace ConvertImageToPdf
     {
       // Tạo biến để lưu selected size
       string selectedSize = "A4"; // Mặc định A4
+      bool isLandscape = false;
+
 
       // Sử dụng Invoke để lấy giá trị từ UI thread
       if (this.InvokeRequired)
@@ -167,42 +169,63 @@ namespace ConvertImageToPdf
         this.Invoke((MethodInvoker)delegate
         {
           selectedSize = pageSizeCombo.SelectedItem?.ToString() ?? "A4";
+          isLandscape = landscapeCheckBox.Checked;
         });
       }
       else
       {
         selectedSize = pageSizeCombo.SelectedItem?.ToString() ?? "A4";
+        isLandscape = landscapeCheckBox.Checked;
       }
 
+      PageSize pageSize;
       switch (selectedSize)
       {
         case "A0":
-          return PageSize.A0;
+          pageSize = PageSize.A0;
+          break;
         case "A1":
-          return PageSize.A1;
+          pageSize = PageSize.A1;
+          break;
         case "A2":
-          return PageSize.A2;
+          pageSize = PageSize.A2;
+          break;
         case "A3":
-          return PageSize.A3;
+          pageSize = PageSize.A3;
+          break;
         case "A5":
-          return PageSize.A5;
+          pageSize = PageSize.A5;
+          break;
         case "A6":
-          return PageSize.A6;
+          pageSize = PageSize.A6;
+          break;
         case "Letter":
-          return PageSize.LETTER;
+          pageSize = PageSize.LETTER;
+          break;
         case "Legal":
-          return PageSize.LEGAL;
+          pageSize = PageSize.LEGAL;
+          break;
         case "B5":
-          return PageSize.B5;
+          pageSize = PageSize.B5;
+          break;
         case "Auto":
-          return CalculateOptimalPageSize();
+          return CalculateOptimalPageSize(isLandscape);
         case "A4":
         default:
-          return PageSize.A4;
+          pageSize = PageSize.A4;
+          break;
       }
+
+      // Xoay ngang nếu được chọn
+      if (isLandscape)
+      {
+        pageSize = pageSize.Rotate();
+      }
+
+      return pageSize;
     }
 
-    private PageSize CalculateOptimalPageSize()
+    private PageSize CalculateOptimalPageSize(bool isLandscape)
     {
       float maxWidth = 0;
       float maxHeight = 0;
@@ -228,8 +251,16 @@ namespace ConvertImageToPdf
       }
 
       // Thêm margins (36 points mỗi bên)
-      maxWidth += (margin * 2);  // 36 * 2
-      maxHeight += (margin * 2); // 36 * 2
+      maxWidth += (margin * 2);  
+      maxHeight += (margin * 2); 
+
+      // Nếu là landscape và chiều cao > chiều rộng, đổi chiều
+      if (isLandscape && maxHeight > maxWidth)
+      {
+        float temp = maxWidth;
+        maxWidth = maxHeight;
+        maxHeight = temp;
+      }
 
       return new PageSize(maxWidth, maxHeight);
     }
@@ -243,21 +274,21 @@ namespace ConvertImageToPdf
         cancelButton.Enabled = true;
         progressBar.Value = 0;
 
-        // Lấy giá trị quality trước khi vào Task.Run
         float quality = 0;
         string selectedPageSize = "Auto";
         float margin = 0;
+        bool isLandscape = false;
 
         this.Invoke((MethodInvoker)delegate
         {
           quality = qualityTrackBar.Value / 100f;
           selectedPageSize = pageSizeCombo.SelectedItem?.ToString() ?? "Auto";
           margin = (float)numericMargin.Value;
+          isLandscape = landscapeCheckBox.Checked;
         });
 
         await Task.Run(() =>
         {
-          // Thiết lập compression level dựa trên quality đã lấy
           var writerProperties = new WriterProperties();
           if (quality < 1)
           {
@@ -266,39 +297,55 @@ namespace ConvertImageToPdf
           }
 
           using (var writer = new PdfWriter(outputPath, writerProperties))
+          using (var pdf = new PdfDocument(writer))
           {
-            using (var pdf = new PdfDocument(writer))
+            var pageSize = GetSelectedPageSize();
+            var document = new Document(pdf, pageSize);
+            document.SetMargins(margin, margin, margin, margin);
+
+            for (int i = 0; i < imagePaths.Count; i++)
             {
-              var pageSize = GetSelectedPageSize();
-              var document = new Document(pdf, pageSize);
-              document.SetMargins(margin, margin, margin, margin);
+              if (cancellationTokenSource.Token.IsCancellationRequested)
+                break;
 
-              for (int i = 0; i < imagePaths.Count; i++)
+              byte[] imageData = File.ReadAllBytes(imagePaths[i]);
+              var imageDataF = ImageDataFactory.Create(imageData);
+              var image = new iText.Layout.Element.Image(imageDataF);
+
+              float maxWidth = pageSize.GetWidth() - (margin * 2);
+              float maxHeight = pageSize.GetHeight() - (margin * 2);
+
+              // Xoay ảnh nếu cần trong chế độ landscape
+              if (isLandscape && image.GetImageHeight() > image.GetImageWidth())
               {
-                if (cancellationTokenSource.Token.IsCancellationRequested)
-                  break;
+                // Xoay ảnh 90 độ
+                image.SetRotationAngle(Math.PI / 2);
 
-                byte[] imageData = File.ReadAllBytes(imagePaths[i]);
-                var image = new iText.Layout.Element.Image(ImageDataFactory.Create(imageData));
-
-                float maxWidth = pageSize.GetWidth() - document.GetLeftMargin() - document.GetRightMargin();
-                float maxHeight = pageSize.GetHeight() - document.GetTopMargin() - document.GetBottomMargin();
-
+                // Điều chỉnh vị trí sau khi xoay
+                image.SetFixedPosition(
+                    (pageSize.GetWidth() - image.GetImageHeight()) / 2 + margin,
+                    (pageSize.GetHeight() - image.GetImageWidth()) / 2
+                );
+              }
+              else
+              {
+                // Căn giữa ảnh nếu không xoay
                 image.ScaleToFit(maxWidth, maxHeight);
                 image.SetHorizontalAlignment(iText.Layout.Properties.HorizontalAlignment.CENTER);
-                document.Add(image);
-
-                if (i < imagePaths.Count - 1)
-                {
-                  document.Add(new AreaBreak());
-                }
-
-                int progress = (int)((i + 1.0) / imagePaths.Count * 100);
-                this.Invoke((MethodInvoker)delegate
-                {
-                  progressBar.Value = progress;
-                });
               }
+
+              document.Add(image);
+
+              if (i < imagePaths.Count - 1)
+              {
+                document.Add(new AreaBreak());
+              }
+
+              int progress = (int)((i + 1.0) / imagePaths.Count * 100);
+              this.Invoke((MethodInvoker)delegate
+              {
+                progressBar.Value = progress;
+              });
             }
           }
         }, cancellationTokenSource.Token);
@@ -322,6 +369,7 @@ namespace ConvertImageToPdf
         cancelButton.Enabled = false;
         progressBar.Value = 0;
       }
+
     }
 
 

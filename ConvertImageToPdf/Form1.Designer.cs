@@ -46,6 +46,7 @@
       label3 = new Label();
       numericMargin = new NumericUpDown();
       label4 = new Label();
+      landscapeCheckBox = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)previewBox).BeginInit();
       ((System.ComponentModel.ISupportInitialize)qualityTrackBar).BeginInit();
       ((System.ComponentModel.ISupportInitialize)numericMargin).BeginInit();
@@ -206,11 +207,22 @@
       label4.TabIndex = 17;
       label4.Text = "Canh lề";
       // 
+      // landscapeCheckBox
+      // 
+      landscapeCheckBox.AutoSize = true;
+      landscapeCheckBox.Location = new Point(317, 320);
+      landscapeCheckBox.Name = "landscapeCheckBox";
+      landscapeCheckBox.Size = new Size(84, 19);
+      landscapeCheckBox.TabIndex = 18;
+      landscapeCheckBox.Text = "Khổ ngang";
+      landscapeCheckBox.UseVisualStyleBackColor = true;
+      // 
       // Form1
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       ClientSize = new Size(800, 450);
+      Controls.Add(landscapeCheckBox);
       Controls.Add(label4);
       Controls.Add(numericMargin);
       Controls.Add(label3);
@@ -257,5 +269,6 @@
     private Label label3;
     private NumericUpDown numericMargin;
     private Label label4;
+    private CheckBox landscapeCheckBox;
   }
 }
