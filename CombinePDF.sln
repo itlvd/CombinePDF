@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CombinePDF", "CombinePDF\CombinePDF.csproj", "{4D3E3133-49F2-4585-999D-01E29AEDBCDE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertImageToPdf", "ConvertImageToPdf\ConvertImageToPdf.csproj", "{B6611FDE-5479-40EE-B7E6-A7F89AA33A6D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4D3E3133-49F2-4585-999D-01E29AEDBCDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D3E3133-49F2-4585-999D-01E29AEDBCDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D3E3133-49F2-4585-999D-01E29AEDBCDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D3E3133-49F2-4585-999D-01E29AEDBCDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6611FDE-5479-40EE-B7E6-A7F89AA33A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6611FDE-5479-40EE-B7E6-A7F89AA33A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6611FDE-5479-40EE-B7E6-A7F89AA33A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6611FDE-5479-40EE-B7E6-A7F89AA33A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
